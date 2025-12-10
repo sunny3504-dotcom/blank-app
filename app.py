@@ -249,10 +249,10 @@ if os.path.exists(logo_path):
         data = f.read()
         encoded_image = base64.b64encode(data).decode()
     
-    st.markdown(
+st.markdown(
         f"""
-        <div style="display: flex; justify-content: center; align-items: center; margin-top: 2rem; margin-bottom: 1rem;">
-            <img src="data:image/png;base64,{encoded_image}" style="width: 400px; max-width: 90%;">
+        <div style="text-align: center; margin: 2rem 0 1rem 0;">
+            <img src="data:image/png;base64,{encoded_image}" style="width: 400px; max-width: 90%; display: block; margin-left: auto; margin-right: auto;">
         </div>
         """,
         unsafe_allow_html=True

@@ -4,6 +4,7 @@
 """
 
 import streamlit as st
+from utils.storage import save_user_data
 
 st.set_page_config(page_title="부모 정보 입력", page_icon="👨‍👩‍👧", layout="wide")
 
@@ -209,5 +210,8 @@ with st.form("parent_form"):
         }
         
         st.session_state.parent_data = parent_data
+# === [여기 붙여넣으세요] ===
+        save_user_data(st.session_state.student_id, parent_data=parent_data)
+        # ==========================        
         st.success("✅ 부모 정보가 저장되었습니다!")
         st.info("👈 사이드바에서 **📊 진행 현황**을 확인하세요.")

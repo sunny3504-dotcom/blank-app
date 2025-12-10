@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 import hashlib
 import json
+from utils.storage import save_user_data
 
 # utils 모듈 경로 추가
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -212,7 +213,13 @@ if cache_key not in st.session_state:
             )
             # 캐시에 저장
             st.session_state[cache_key] = prescription
-            
+# === [여기 붙여넣으세요] ===
+            save_user_data(
+                st.session_state.student_id, 
+                prescription=prescription, 
+                cache_key=cache_key
+            )
+            # ==========================            
             if prescription is None:
                 st.warning("""
                 ⚠️ **Gemini API 키가 설정되지 않았습니다.**

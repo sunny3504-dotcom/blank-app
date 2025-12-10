@@ -3,6 +3,8 @@
 CareerBridge - AI 진로 추천 플랫폼
 특성화고 전기과 학생을 위한 딥러닝 기반 진로 설계 시스템
 """
+import os
+from utils.storage import load_user_data  # <--- 이 줄 추가
 
 import streamlit as st
 from PIL import Image
@@ -343,6 +345,18 @@ with st.form("login_form"):
     if submitted:
         if student_name and len(student_name.strip()) > 0:
             st.session_state.student_id = student_name.strip()
+# === [여기 붙여넣으세요] ===
+            saved_data = load_user_data(st.session_state.student_id)
+            if saved_data:
+                if 'student_data' in saved_data:
+                    st.session_state.student_data = saved_data['student_data']
+                if 'parent_data' in saved_data:
+                    st.session_state.parent_data = saved_data['parent_data']
+                if 'prescriptions' in saved_data:
+                    for key, value in saved_data['prescriptions'].items():
+                        st.session_state[key] = value
+                st.toast("📂 이전 작업 내용을 불러왔습니다.", icon="✅")
+            # ==========================            
             st.success(f"✅ {student_name}님, 환영합니다!")
             st.info("👈 왼쪽 사이드바에서 **학생 정보 입력**을 시작하세요.")
         else:

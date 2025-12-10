@@ -5,7 +5,7 @@ CareerBridge - AI 진로 추천 플랫폼
 """
 import os
 from utils.storage import load_user_data  # <--- 이 줄 추가
-
+import base64
 import streamlit as st
 from PIL import Image
 import os
@@ -244,10 +244,19 @@ else:
 # 로고 이미지 표시
 logo_path = "assets/logo.png"
 if os.path.exists(logo_path):
-    # 컨테이너를 사용하여 중앙 정렬
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image(logo_path)
+    # [수정] 이미지를 HTML로 직접 렌더링하여 완벽하게 중앙 정렬
+    with open(logo_path, "rb") as f:
+        data = f.read()
+        encoded_image = base64.b64encode(data).decode()
+    
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 2rem; margin-bottom: 1rem;">
+            <img src="data:image/png;base64,{encoded_image}" style="width: 400px; max-width: 90%;">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 else:
     st.markdown("""
     <div class="logo-container">

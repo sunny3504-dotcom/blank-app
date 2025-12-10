@@ -4,11 +4,9 @@ CareerBridge - AI 진로 추천 플랫폼
 특성화고 전기과 학생을 위한 딥러닝 기반 진로 설계 시스템
 """
 import os
-from utils.storage import load_user_data  # <--- 이 줄 추가
-import base64
 import streamlit as st
 from PIL import Image
-import os
+from utils.storage import load_user_data
 
 # 페이지 설정
 st.set_page_config(
@@ -242,29 +240,15 @@ else:
 """, unsafe_allow_html=True)
 
 # 로고 이미지 표시
+st.markdown('<div style="text-align: center; padding: 2rem 0 1rem 0;">', unsafe_allow_html=True)
 logo_path = "assets/logo.png"
 if os.path.exists(logo_path):
-    # [수정] 이미지를 HTML로 직접 렌더링하여 완벽하게 중앙 정렬
-    with open(logo_path, "rb") as f:
-        data = f.read()
-        encoded_image = base64.b64encode(data).decode()
-    
-st.markdown(
-        f"""
-        <div style="text-align: center; margin: 2rem 0 1rem 0;">
-            <img src="data:image/png;base64,{encoded_image}" style="width: 400px; max-width: 90%; display: block; margin-left: auto; margin-right: auto;">
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image(logo_path, use_container_width=True)
 else:
-    st.markdown("""
-    <div class="logo-container">
-        <h1 style='font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
-            🎓 CareerBridge
-        </h1>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<h1 style="text-align: center;">🎓 CareerBridge</h1>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 사이드바에 로그아웃 버튼 추가 (로그인 후에만)
 if st.session_state.student_id:

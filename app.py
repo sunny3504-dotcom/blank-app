@@ -242,17 +242,11 @@ else:
 # 로고 이미지 표시
 logo_path = "assets/logo.png"
 if os.path.exists(logo_path):
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image(logo_path)
+    st.markdown('<div style="text-align: center; margin: 2rem 0 1rem 0;">', unsafe_allow_html=True)
+    st.image(logo_path, width=400)
+    st.markdown('</div>', unsafe_allow_html=True)
 else:
-    st.markdown("""
-    <div class="logo-container">
-        <h1 style='font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
-            🎓 CareerBridge
-        </h1>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<h1 style="text-align: center; margin: 2rem 0 1rem 0;">🎓 CareerBridge</h1>', unsafe_allow_html=True)
 
 # 사이드바에 로그아웃 버튼 추가 (로그인 후에만)
 if st.session_state.student_id:

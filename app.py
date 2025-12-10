@@ -243,7 +243,9 @@ else:
 st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
 logo_path = "assets/logo.png"
 if os.path.exists(logo_path):
-    st.image(logo_path, width=400)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image(logo_path, use_container_width=True)
 else:
     st.title("🎓 CareerBridge")
 st.markdown("</div>", unsafe_allow_html=True)

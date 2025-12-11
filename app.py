@@ -270,7 +270,7 @@ with col1:
         <div class="feature-icon">📊</div>
         <div class="feature-title">5000명 졸업생 데이터</div>
         <div class="feature-desc">
-            실제 졸업생 빅데이터 기반 분석으로 신뢰도 높은 진로 추천
+            실제 졸업생의 빅데이터 분석으로 신뢰도 높은 진로 추천
         </div>
     </div>
     """, unsafe_allow_html=True)

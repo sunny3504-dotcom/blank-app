@@ -278,7 +278,7 @@ with col1:
     st.markdown("""
     <div class="feature-card">
         <div class="feature-icon">💡</div>
-        <div class="feature-title">GPT 맞춤형 처방전</div>
+        <div class="feature-title">Gemini 맞춤형 처방전</div>
         <div class="feature-desc">
             Gemini AI가 생성하는 개인별 진로 로드맵
         </div>

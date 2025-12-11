@@ -192,7 +192,7 @@ Educational use only.
 
 ## 👤 개발자
 
-Sunny (2025431005)
+Sunny 
 Yonsei University Graduate School of Education
 Educational Technology
 

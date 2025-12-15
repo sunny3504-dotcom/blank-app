@@ -104,53 +104,42 @@ def generate_prescription(student_data: dict, parent_data: dict, prediction: dic
 try:
     response = model.generate_content(prompt)
 
-    # 🔒 [필수] 응답이 비었는지 / 안전성으로 차단되었는지 먼저 검사
+    # 응답 안전성 체크
     if (
         not response
         or not getattr(response, "candidates", None)
         or len(response.candidates) == 0
         or not response.candidates[0].content.parts
     ):
-        # 안전성 필터 또는 응답 없음 → fallback 리턴
         return {
-            "진로로드맵": "⚠️ Gemini가 안전성 정책으로 인해 응답을 생성하지 못했습니다.",
-            "강점약점전략": "⚠️ 기본 분석만 제공됩니다.",
-            "부모학생분석": "⚠️ 응답 생성 실패로 인해 간단한 메시지만 제공합니다."
+            "roadmap": "⚠️ Gemini가 안전성 정책으로 인해 응답을 생성하지 못했습니다.",
+            "strategy": "⚠️ 기본 분석만 제공됩니다.",
+            "gap_analysis": "⚠️ 응답 생성 실패로 인해 간단한 메시지만 제공합니다."
         }
 
-    # 🔵 여기까지 통과했다면 이제야 안전하게 response.text 접근 가능
     text = response.text
 
-        
-        # 구분자를 기준으로 섹션 분리 (훨씬 정확함)
-        parts = text.split("[[SECTION_SPLIT]]")
-        
-        # 리스트 개수가 부족할 경우 대비
-        roadmap = parts[0].strip() if len(parts) > 0 else "분석 결과가 없습니다."
-        strategy = parts[1].strip() if len(parts) > 1 else "분석 결과가 없습니다."
-        gap_analysis = parts[2].strip() if len(parts) > 2 else "분석 결과가 없습니다."
-        
-        # Markdown 제목(#)이 포함되어 있다면 제거 (UI 타이틀과 중복 방지)
-        def clean_markdown_headers(content):
-            lines = content.split('\n')
-            cleaned = []
-            for line in lines:
-                # 섹션 제목으로 추정되는 라인 제거
-                if line.strip().startswith("#"):
-                    continue
-                cleaned.append(line)
-            return '\n'.join(cleaned).strip()
+    # 섹션 분리
+    parts = text.split("[[SECTION_SPLIT]]")
+    roadmap = parts[0].strip() if len(parts) > 0 else ""
+    strategy = parts[1].strip() if len(parts) > 1 else ""
+    gap_analysis = parts[2].strip() if len(parts) > 2 else ""
 
-        return {
-            "roadmap": clean_markdown_headers(roadmap),
-            "strategy": clean_markdown_headers(strategy),
-            "gap_analysis": clean_markdown_headers(gap_analysis),
-            "full_text": text.replace("[[SECTION_SPLIT]]", "\n\n---\n\n")
-        }
-        
-    except Exception as e:
-        st.error(f"❌ Gemini API 호출 오류: {e}")
-        return generate_fallback_prescription(student_data, parent_data, prediction)
+    # 헤더 제거 함수
+    def clean_headers(t):
+        return "\n".join([line for line in t.split("\n") if not line.startswith("#")]).strip()
+
+    return {
+        "roadmap": clean_headers(roadmap),
+        "strategy": clean_headers(strategy),
+        "gap_analysis": clean_headers(gap_analysis),
+        "full_text": text.replace("[[SECTION_SPLIT]]", "\n\n---\n\n")
+    }
+
+except Exception as e:
+    st.error(f"❌ Gemini API 호출 오류: {e}")
+    return generate_fallback_prescription(student_data, parent_data, prediction)
+
 
 
 def generate_fallback_prescription(student_data: dict, parent_data: dict, prediction: dict):

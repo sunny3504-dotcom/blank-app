@@ -8,8 +8,17 @@ from utils.storage import save_user_data
 
 st.set_page_config(page_title="학생 정보 입력", page_icon="🎓", layout="wide")
 
+# -------------------------------------------------------
+# ✅ 선택박스 기본값 설정을 위한 헬퍼 함수 (추가: 오류 방지 + 기본값 유지)
+# -------------------------------------------------------
+def default_index(options, value, fallback_index=0):
+    try:
+        return options.index(value)
+    except:
+        return fallback_index
+
 # ==== 🔵 저장된 데이터 불러오기 (추가된 유일한 핵심 기능) ====
-stored = st.session_state.get("student_data", {})  # ⚡ 기존 저장된 값을 불러오는 핵심 코드
+stored = st.session_state.get("student_data") or {}  # ✅ None 방지
 
 # 사이드바 "홈" 스타일 (연한 회색, 강조 없음)
 st.markdown("""
@@ -69,23 +78,13 @@ st.title("🎓 학생 정보 입력")
 st.markdown(f"**세션 ID:** {st.session_state.student_id}")
 st.markdown("---")
 
-# -------------------------------------------------------
-# ⚠️ 선택박스 기본값 설정을 위한 헬퍼 함수 (오류 방지용)
-# -------------------------------------------------------
-def default_index(options, value, fallback_index=0):
-    try:
-        return options.index(value)
-    except:
-        return fallback_index
-
-
 # 폼 시작
 with st.form("student_form"):
-    
+
     # ========== 1단계: 기본 정보 ==========
     st.subheader("📝 1단계: 기본 정보")
     col1, col2 = st.columns(2)
-    
+
     with col1:
         options = [1, 2, 3]
         학년 = st.selectbox(
@@ -94,99 +93,102 @@ with st.form("student_form"):
             index=default_index(options, stored.get("학년", 2), 1),
             help="현재 본인의 학년을 선택해주세요."
         )
-    
+
     with col2:
-        options = ["내선전기공사", "변전설비공사", "외선전기공사", "전기공사관리", 
-             "전기기기설계", "전기기기유지보수", "전기기기제작", "전기전선제조"]
+        options = ["내선전기공사", "변전설비공사", "외선전기공사", "전기공사관리",
+                   "전기기기설계", "전기기기유지보수", "전기기기제작", "전기전선제조"]
         학생_희망직무 = st.selectbox(
             "희망 직무(NCS) *",
             options,
-            index=default_index(options, stored.get("학생_희망직무", options[0])),
+            index=default_index(options, stored.get("학생_희망직무", options[0]), 0),
             help="앞으로 일하고 싶은 전기 분야 직무를 선택해주세요."
         )
-    
+
     st.markdown("---")
-    
+
     # ========== 2단계: 역량 평가 ==========
     st.subheader("📊 2단계: 역량 평가")
-    
+
     # 직업기초능력평가
     st.markdown("**직업기초능력평가 등급**")
     col1, col2, col3, col4, col5 = st.columns(5)
 
-    # 국어
     with col1:
-        options = [1,2,3,4,5]
+        options = [1, 2, 3, 4, 5]
         학생_직기초_의사소통_국어 = st.selectbox(
             "의사소통(국어) *",
             options,
-            index=default_index(options, stored.get("학생_직기초_의사소통_국어", 3), 2)
+            index=default_index(options, stored.get("학생_직기초_의사소통_국어", 3), 2),
+            help="직업기초능력 평가의 의사소통(국어) 영역 등급을 선택해주세요."
         )
 
-    # 영어
     with col2:
-        options = [1,2,3,4,5]
+        options = [1, 2, 3, 4, 5]
         학생_직기초_의사소통_영어 = st.selectbox(
             "의사소통(영어) *",
             options,
-            index=default_index(options, stored.get("학생_직기초_의사소통_영어", 3), 2)
+            index=default_index(options, stored.get("학생_직기초_의사소통_영어", 3), 2),
+            help="직업기초능력 평가의 의사소통(영어) 영역 등급을 선택해주세요."
         )
 
-    # 수리활용
     with col3:
-        options = [1,2,3,4,5]
+        options = [1, 2, 3, 4, 5]
         학생_직기초_수리활용 = st.selectbox(
             "수리활용 *",
             options,
-            index=default_index(options, stored.get("학생_직기초_수리활용", 3), 2)
+            index=default_index(options, stored.get("학생_직기초_수리활용", 3), 2),
+            help="직업기초능력 평가의 수리활용 영역 등급을 선택해주세요."
         )
 
-    # 문제해결
     with col4:
-        options = [1,2,3,4,5]
+        options = [1, 2, 3, 4, 5]
         학생_직기초_문제해결 = st.selectbox(
             "문제해결 *",
             options,
-            index=default_index(options, stored.get("학생_직기초_문제해결", 3), 2)
+            index=default_index(options, stored.get("학생_직기초_문제해결", 3), 2),
+            help="직업기초능력 평가의 문제해결 영역 등급을 선택해주세요."
         )
 
-    # 직무적응
     with col5:
-        options = [1,2,3,4,5]
+        options = [1, 2, 3, 4, 5]
         학생_직기초_직무적응 = st.selectbox(
             "직무적응 *",
             options,
-            index=default_index(options, stored.get("학생_직기초_직무적응", 3), 2)
+            index=default_index(options, stored.get("학생_직기초_직무적응", 3), 2),
+            help="직무 적응 능력 평가 등급을 선택해주세요."
         )
-    
+
     # 교과 성취도
     st.markdown("**교과 성취도**")
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        options = ["A","B","C","D","E"]
+        options = ["A", "B", "C", "D", "E"]
         학생_전기교과성취도 = st.selectbox(
             "전기 교과 성취도 *",
             options,
-            index=default_index(options, stored.get("학생_전기교과성취도", "B"), 1)
+            index=default_index(options, stored.get("학생_전기교과성취도", "B"), 1),
+            help="최근 성취도 평가에서 받은 전기 교과 등급을 선택해주세요."
         )
-    
+
     with col2:
-        options = ["A","B","C","D","E"]
+        options = ["A", "B", "C", "D", "E"]
         학생_수학교과성취도 = st.selectbox(
             "수학 교과 성취도 *",
             options,
-            index=default_index(options, stored.get("학생_수학교과성취도", "B"), 1)
+            index=default_index(options, stored.get("학생_수학교과성취도", "B"), 1),
+            help="최근 성취도 평가에서 받은 수학 교과 등급을 선택해주세요."
         )
-    
+
     with col3:
-        options = ["A","B","C","D","E"]
+        options = ["A", "B", "C", "D", "E"]
         학생_NCS능력단위_수행평가 = st.selectbox(
             "NCS 능력단위 수행평가 *",
             options,
-            index=default_index(options, stored.get("학생_NCS능력단위_수행평가", "B"), 1)
+            index=default_index(options, stored.get("학생_NCS능력단위_수행평가", "B"), 1),
+            help="NCS 능력단위 평가에서 받은 등급을 선택해주세요."
         )
-    
+
     # 자격증
     st.markdown("**자격증**")
     col1, col2 = st.columns(2)
@@ -196,20 +198,22 @@ with st.form("student_form"):
         학생_자격증_전기기능사 = st.selectbox(
             "전기기능사 *",
             options,
-            index=default_index(options, stored.get("학생_자격증_전기기능사", "무"), 1)
+            index=default_index(options, stored.get("학생_자격증_전기기능사", "무"), 1),
+            help="전기기능사 자격증 취득 여부를 선택해주세요."
         )
-    
+
     with col2:
         options = ["유", "무"]
         학생_자격증_철도전기신호기능사 = st.selectbox(
             "철도전기신호기능사 *",
             options,
-            index=default_index(options, stored.get("학생_자격증_철도전기신호기능사", "무"), 1)
+            index=default_index(options, stored.get("학생_자격증_철도전기신호기능사", "무"), 1),
+            help="철도전기신호기능사 자격증 취득 여부를 선택해주세요."
         )
-    
+
     st.markdown("---")
-    
-    # ========== 3단계: 직업 선호도 및 적합성 ==========
+
+   # ========== 3단계: 직업 선호도 및 적합성 ==========
     st.subheader("💼 3단계: 직업 선호도 및 적합성")
     
     col1, col2 = st.columns(2)
@@ -315,90 +319,100 @@ with st.form("student_form"):
         )
     
     st.markdown("---")
-    
+
     # ========== 4단계: 자기인식 및 진로 관련 태도 ==========
     st.subheader("🧠 4단계: 자기인식 및 진로 관련 태도")
-    
+
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        options = ["매우 낮음","낮음","보통","높음","매우 높음"]
+        options = ["매우 낮음", "낮음", "보통", "높음", "매우 높음"]
         학생_자기강점인식 = st.selectbox(
             "자기 강점 인식 *",
             options,
-            index=default_index(options, stored.get("학생_자기강점인식", "보통"), 2)
+            index=default_index(options, stored.get("학생_자기강점인식", "보통"), 2),
+            help="스스로 인식하는 나의 강점 수준을 선택해주세요."
         )
-        
+
         학생_진로결정자기효능감 = st.selectbox(
             "진로결정 자기효능감 *",
             options,
-            index=default_index(options, stored.get("학생_진로결정자기효능감", "보통"), 2)
+            index=default_index(options, stored.get("학생_진로결정자기효능감", "보통"), 2),
+            help="진로를 스스로 결정할 수 있는 자신감 수준을 선택해주세요."
         )
-        
+
         학생_부모지지인식 = st.selectbox(
             "부모 지지 인식 *",
             options,
-            index=default_index(options, stored.get("학생_부모지지인식", "보통"), 2)
+            index=default_index(options, stored.get("학생_부모지지인식", "보통"), 2),
+            help="부모님이 나의 진로를 얼마나 지지한다고 느끼는지 선택해주세요."
         )
-    
+
     with col2:
-        options = ["매우 낮음","낮음","보통","높음","매우 높음"]
+        options = ["매우 낮음", "낮음", "보통", "높음", "매우 높음"]
         학생_학습태도자기평가 = st.selectbox(
             "학습태도 자기평가 *",
             options,
-            index=default_index(options, stored.get("학생_학습태도자기평가", "보통"), 2)
+            index=default_index(options, stored.get("학생_학습태도자기평가", "보통"), 2),
+            help="학습 임하는 나의 태도와 노력 수준을 선택해주세요."
         )
-        
+
         학생_진로변화의향 = st.selectbox(
             "진로 변화 의향 *",
             options,
-            index=default_index(options, stored.get("학생_진로변화의향", "보통"), 2)
+            index=default_index(options, stored.get("학생_진로변화의향", "보통"), 2),
+            help="진로 계획을 바꿀 의향이 어느 정도인지 선택해주세요."
         )
-        
+
         학생_부모압력인식 = st.selectbox(
             "부모 압력 인식 *",
             options,
-            index=default_index(options, stored.get("학생_부모압력인식", "보통"), 2)
+            index=default_index(options, stored.get("학생_부모압력인식", "보통"), 2),
+            help="부모님이 진로에 얼마나 영향을 주거나 압력을 가한다고 느끼는지 선택해주세요."
         )
-    
+
     with col3:
-        options = ["매우 낮음","낮음","보통","높음","매우 높음"]
+        options = ["매우 낮음", "낮음", "보통", "높음", "매우 높음"]
         학생_희망직무전망인식 = st.selectbox(
             "희망직무 전망 인식 *",
             options,
-            index=default_index(options, stored.get("학생_희망직무전망인식", "보통"), 2)
+            index=default_index(options, stored.get("학생_희망직무전망인식", "보통"), 2),
+            help="희망 직무의 미래 전망을 어떻게 보는지 선택해주세요."
         )
-        
-        options = ["매우 불만족","불만족","보통","만족","매우 만족"]
+
+        options = ["매우 불만족", "불만족", "보통", "만족", "매우 만족"]
         학생_진로대화만족도 = st.selectbox(
             "진로 대화 만족도 *",
             options,
-            index=default_index(options, stored.get("학생_진로대화만족도", "보통"), 2)
+            index=default_index(options, stored.get("학생_진로대화만족도", "보통"), 2),
+            help="부모님과의 진로 대화에 얼마나 만족하는지 선택해주세요."
         )
-    
+
     # 자기강점유형 및 희망직무일치수준
     col1, col2 = st.columns(2)
-    
+
     with col1:
         options = ["책임감", "문제해결력", "집중력", "손재능", "의사소통", "협업능력", "리더십", "창의성", "기타"]
         학생_자기강점유형 = st.selectbox(
             "자기 강점 유형 *",
             options,
-            index=default_index(options, stored.get("학생_자기강점유형", options[0]))
+            index=default_index(options, stored.get("학생_자기강점유형", options[0]), 0),
+            help="본인이 가진 주요 강점을 선택해주세요."
         )
-    
+
     with col2:
         options = ["거의 동일", "부분 유사", "완전 다름"]
         학생_희망직무일치수준 = st.selectbox(
             "희망직무 일치 수준 *",
             options,
-            index=default_index(options, stored.get("학생_희망직무일치수준", "부분 유사"), 1)
+            index=default_index(options, stored.get("학생_희망직무일치수준", "부분 유사"), 1),
+            help="나와 부모님의 희망 직무가 어느 정도 일치한다고 생각하는지 선택해주세요."
         )
-    
+
     # 제출 버튼
     st.markdown("---")
     submitted = st.form_submit_button("💾 학생 정보 저장하기", use_container_width=True)
-    
+
     if submitted:
         # 데이터 저장
         student_data = {
@@ -437,7 +451,7 @@ with st.form("student_form"):
             "학생_자기강점유형": 학생_자기강점유형,
             "학생_희망직무일치수준": 학생_희망직무일치수준
         }
-        
+
         st.session_state.student_data = student_data
         save_user_data(st.session_state.student_id, student_data=student_data)
 

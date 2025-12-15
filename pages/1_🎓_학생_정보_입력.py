@@ -213,124 +213,124 @@ with st.form("student_form"):
 
     st.markdown("---")
 
-# ========== 3단계: 직업 선호도 및 적합성 ==========
-st.subheader("💼 3단계: 직업 선호도 및 적합성")
-
-col1, col2 = st.columns(2)
-
-# ---- LEFT ----
-with col1:
-    # 직업환경유형
-    options = ["관료형","기업형","전문직형","창업형","학자형","해외형"]
-    학생_직업환경유형 = st.selectbox(
-        "직업 환경 유형 *",
-        options,
-        index=default_index(options, stored.get("학생_직업환경유형", options[0])),
-        help="업무 방식, 조직 문화, 일의 성격 측면에서 본인에게 가장 잘 맞는 직업 환경 유형을 선택해주세요."
-    )
+    # ========== 3단계: 직업 선호도 및 적합성 ==========
+    st.subheader("💼 3단계: 직업 선호도 및 적합성")
     
-    # 산업선호도 1순위
-    options = ["개인서비스","공공","교육","교통/물류","금융",
-        "미디어/엔터테인먼트","보건/의료","산업기술/에너지공정",
-        "전자/첨단기술","제조"]
-    학생_산업선호도1순위 = st.selectbox(
-        "산업선호도 1순위 *",
-        options,
-        index=default_index(options, stored.get("학생_산업선호도1순위", options[0])),
-        help="가장 관심 있고, 향후 진로로 고려하고 싶은 산업 분야를 선택해주세요."
-    )
+    col1, col2 = st.columns(2)
     
-    # 기업직무적합 1순위
-    options = ["기획","마케팅","생산","연구개발","영업","인사","재무","홍보"]
-    학생_기업직무적합1순위 = st.selectbox(
-        "기업직무적합 1순위 *",
-        options,
-        index=default_index(options, stored.get("학생_기업직무적합1순위", options[0])),
-        help="기업 내에서 본인의 성향과 역량이 가장 잘 맞을 것이라고 생각하는 직무를 선택해주세요."
-    )
-
-# ---- RIGHT ----
-with col2:
-    # 흥미 일관성 등급
-    options = ["A","B","C","D","E"]
-    학생_흥미일관성등급 = st.selectbox(
-        "흥미 일관성 등급 *",
-        options,
-        index=default_index(options, stored.get("학생_흥미일관성등급", "C"), 2),
-        help="여러 검사나 경험에서 진로 흥미가 얼마나 일관되게 나타나는지에 대한 수준을 선택해주세요."
-    )
+    # ---- LEFT ----
+    with col1:
+        # 직업환경유형
+        options = ["관료형","기업형","전문직형","창업형","학자형","해외형"]
+        학생_직업환경유형 = st.selectbox(
+            "직업 환경 유형 *",
+            options,
+            index=default_index(options, stored.get("학생_직업환경유형", options[0])),
+            help="업무 방식, 조직 문화, 일의 성격 측면에서 본인에게 가장 잘 맞는 직업 환경 유형을 선택해주세요."
+        )
+        
+        # 산업선호도 1순위
+        options = ["개인서비스","공공","교육","교통/물류","금융",
+            "미디어/엔터테인먼트","보건/의료","산업기술/에너지공정",
+            "전자/첨단기술","제조"]
+        학생_산업선호도1순위 = st.selectbox(
+            "산업선호도 1순위 *",
+            options,
+            index=default_index(options, stored.get("학생_산업선호도1순위", options[0])),
+            help="가장 관심 있고, 향후 진로로 고려하고 싶은 산업 분야를 선택해주세요."
+        )
+        
+        # 기업직무적합 1순위
+        options = ["기획","마케팅","생산","연구개발","영업","인사","재무","홍보"]
+        학생_기업직무적합1순위 = st.selectbox(
+            "기업직무적합 1순위 *",
+            options,
+            index=default_index(options, stored.get("학생_기업직무적합1순위", options[0])),
+            help="기업 내에서 본인의 성향과 역량이 가장 잘 맞을 것이라고 생각하는 직무를 선택해주세요."
+        )
     
-    # 산업선호도 2순위
-    options = ["개인서비스","공공","교육","교통/물류","금융",
-        "미디어/엔터테인먼트","보건/의료","산업기술/에너지공정",
-        "전자/첨단기술","제조"]
-    학생_산업선호도2순위 = st.selectbox(
-        "산업선호도 2순위 *",
-        options,
-        index=default_index(options, stored.get("학생_산업선호도2순위", options[0])),
-        help="1순위 다음으로 관심이 있는 산업 분야를 선택해주세요."
-    )
+    # ---- RIGHT ----
+    with col2:
+        # 흥미 일관성 등급
+        options = ["A","B","C","D","E"]
+        학생_흥미일관성등급 = st.selectbox(
+            "흥미 일관성 등급 *",
+            options,
+            index=default_index(options, stored.get("학생_흥미일관성등급", "C"), 2),
+            help="여러 검사나 경험에서 진로 흥미가 얼마나 일관되게 나타나는지에 대한 수준을 선택해주세요."
+        )
+        
+        # 산업선호도 2순위
+        options = ["개인서비스","공공","교육","교통/물류","금융",
+            "미디어/엔터테인먼트","보건/의료","산업기술/에너지공정",
+            "전자/첨단기술","제조"]
+        학생_산업선호도2순위 = st.selectbox(
+            "산업선호도 2순위 *",
+            options,
+            index=default_index(options, stored.get("학생_산업선호도2순위", options[0])),
+            help="1순위 다음으로 관심이 있는 산업 분야를 선택해주세요."
+        )
+        
+        # 기업직무적합 2순위
+        options = ["기획","마케팅","생산","연구개발","영업","인사","재무","홍보"]
+        학생_기업직무적합2순위 = st.selectbox(
+            "기업직무적합 2순위 *",
+            options,
+            index=default_index(options, stored.get("학생_기업직무적합2순위", options[1]), 1),
+            help="1순위 다음으로 적합하다고 생각되는 기업 내 직무를 선택해주세요."
+        )
     
-    # 기업직무적합 2순위
-    options = ["기획","마케팅","생산","연구개발","영업","인사","재무","홍보"]
-    학생_기업직무적합2순위 = st.selectbox(
-        "기업직무적합 2순위 *",
-        options,
-        index=default_index(options, stored.get("학생_기업직무적합2순위", options[1]), 1),
-        help="1순위 다음으로 적합하다고 생각되는 기업 내 직무를 선택해주세요."
-    )
-
-# 근무 환경 선호
-st.markdown("**근무 환경 선호**")
-col1, col2, col3, col4, col5 = st.columns(5)
-
-with col1:
-    options = ["실내","실외","상관없음"]
-    학생_근무환경선호_실내실외 = st.selectbox(
-        "실내·실외 선호 *",
-        options,
-        index=default_index(options, stored.get("학생_근무환경선호_실내실외", "상관없음"), 2),
-        help="주로 실내 또는 실외에서 근무하는 환경 중 선호하는 형태를 선택해주세요."
-    )
-
-with col2:
-    options = ["가능","불가"]
-    학생_근무환경선호_교대근무 = st.selectbox(
-        "교대근무 *",
-        options,
-        index=default_index(options, stored.get("학생_근무환경선호_교대근무", "불가")),
-        help="2교대·3교대 등 교대 근무가 가능한지 선택해주세요."
-    )
-
-with col3:
-    options = ["가능","불가"]
-    학생_근무환경선호_야간근무 = st.selectbox(
-        "야간근무 *",
-        options,
-        index=default_index(options, stored.get("학생_근무환경선호_야간근무", "불가")),
-        help="야간 시간대 근무가 가능한지 선택해주세요."
-    )
-
-with col4:
-    options = ["가능","불가"]
-    학생_근무환경선호_고소작업 = st.selectbox(
-        "고소작업 *",
-        options,
-        index=default_index(options, stored.get("학생_근무환경선호_고소작업", "불가")),
-        help="높은 장소에서의 작업(고소작업)이 가능한지 선택해주세요."
-    )
-
-with col5:
-    options = ["상관없음","팀 작업 선호","혼자 작업 선호"]
-    학생_근무환경선호_팀작업 = st.selectbox(
-        "팀작업 선호 *",
-        options,
-        index=default_index(options, stored.get("학생_근무환경선호_팀작업", "상관없음")),
-        help="업무 수행 시 협업 방식에 대한 선호를 선택해주세요."
-    )
-
-st.markdown("---")
-
+    # 근무 환경 선호
+    st.markdown("**근무 환경 선호**")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        options = ["실내","실외","상관없음"]
+        학생_근무환경선호_실내실외 = st.selectbox(
+            "실내·실외 선호 *",
+            options,
+            index=default_index(options, stored.get("학생_근무환경선호_실내실외", "상관없음"), 2),
+            help="주로 실내 또는 실외에서 근무하는 환경 중 선호하는 형태를 선택해주세요."
+        )
+    
+    with col2:
+        options = ["가능","불가"]
+        학생_근무환경선호_교대근무 = st.selectbox(
+            "교대근무 *",
+            options,
+            index=default_index(options, stored.get("학생_근무환경선호_교대근무", "불가")),
+            help="2교대·3교대 등 교대 근무가 가능한지 선택해주세요."
+        )
+    
+    with col3:
+        options = ["가능","불가"]
+        학생_근무환경선호_야간근무 = st.selectbox(
+            "야간근무 *",
+            options,
+            index=default_index(options, stored.get("학생_근무환경선호_야간근무", "불가")),
+            help="야간 시간대 근무가 가능한지 선택해주세요."
+        )
+    
+    with col4:
+        options = ["가능","불가"]
+        학생_근무환경선호_고소작업 = st.selectbox(
+            "고소작업 *",
+            options,
+            index=default_index(options, stored.get("학생_근무환경선호_고소작업", "불가")),
+            help="높은 장소에서의 작업(고소작업)이 가능한지 선택해주세요."
+        )
+    
+    with col5:
+        options = ["상관없음","팀 작업 선호","혼자 작업 선호"]
+        학생_근무환경선호_팀작업 = st.selectbox(
+            "팀작업 선호 *",
+            options,
+            index=default_index(options, stored.get("학생_근무환경선호_팀작업", "상관없음")),
+            help="업무 수행 시 협업 방식에 대한 선호를 선택해주세요."
+        )
+    
+    st.markdown("---")
+    
 
     # ========== 4단계: 자기인식 및 진로 관련 태도 ==========
     st.subheader("🧠 4단계: 자기인식 및 진로 관련 태도")

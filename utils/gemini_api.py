@@ -20,7 +20,7 @@ def initialize_gemini():
 
         genai.configure(api_key=api_key)
 
-        # 모델 초기화 (최신 버전)
+        # 모델 초기화
         model = genai.GenerativeModel('gemini-flash-latest')
         return model
 
@@ -55,14 +55,16 @@ def generate_prescription(student_data: dict, parent_data: dict, prediction: dic
 학생과 부모를 평가하거나 단정하는 표현도 사용하지 마십시오.
 
 ⚠️ 아래 규칙은 반드시 지켜야 합니다.
-1) 세 개의 섹션은 반드시 구분되어야 합니다.
-2) 섹션 사이에는 정확히 [[SECTION_SPLIT]] 를 넣어야 합니다.
-3) 구분자를 생략하거나 변형하면 안 됩니다.
-4) 세 섹션의 순서는 반드시 유지해야 합니다.
-5) 각 섹션은 반드시 명확한 제목을 포함해야 합니다. (예: [진로 로드맵])
+1) 출력은 반드시 3개의 섹션으로 구성해야 합니다.
+2) 각 섹션 제목은 반드시 아래 형식을 따라야 합니다:
+   [진로 로드맵], [강점·약점 전략], [부모–학생 분석]
+3) 각 섹션 본문은 제목 바로 아래에 작성해야 합니다.
+4) 각 섹션 사이에는 반드시 정확히 [[SECTION_SPLIT]] 를 삽입해야 합니다.
+5) 구분자를 생략하거나 변형하면 안 됩니다.
+6) 섹션 1 → 섹션 2 → 섹션 3 순서를 반드시 유지하십시오.
 
 당신은 특성화고 전기과 학생을 위한 전문 진로 컨설턴트입니다.
-아래 학생 데이터를 분석하여 **가독성이 뛰어나고 실천적인 진로 처방전**을 작성해주세요.
+아래 학생 데이터를 기반으로 **가독성이 높고 실천적인 진로 처방전**을 작성하세요.
 
 ---
 ## 1. 학생 기본 데이터
@@ -85,21 +87,24 @@ def generate_prescription(student_data: dict, parent_data: dict, prediction: dic
 
 ---
 
-## 작성할 내용 (3개 섹션)
-각 섹션은 반드시 아래 제목 형식을 포함해야 합니다:
+## 반드시 작성할 결과물 (3개 섹션)
 
-[진로 로드맵]  
-내용…  
+[진로 로드맵]
+- 현재 위치: 학생의 현재 역량을 NCS 관점에서 요약
+- 학년별 목표: {student_data.get('학년', 1)}학년부터 졸업까지의 로드맵
+- 성장 전략: 부족한 직업기초능력/교과목 보완 전략 2~3개
 [[SECTION_SPLIT]]
 
-[강점·약점 전략]  
-내용…  
+[강점·약점 전략]
+- 핵심 강점: 학생의 강점이 추천 직무({prediction['top3_jobs'][0]})에서 어떻게 발휘되는지
+- 보완점: 약점을 보완하기 위한 구체적 학습/태도 전략
+- 직무 적합성(Fit): 학생 성향과 직무 환경의 일치 여부 분석
 [[SECTION_SPLIT]]
 
-[부모–학생 분석]  
-내용…
-
----
+[부모–학생 분석]
+- 인식 차이: 부모와 학생의 희망 직무 차이를 객관적으로 비교
+- 지지와 소통: 부모의 지지·압력 수준 기반 대화 전략
+- AI 제언: 갈등을 줄이고 시너지를 낼 수 있는 실질적 제안
 
 이제 작성을 시작하세요.
 """
@@ -147,7 +152,7 @@ def generate_prescription(student_data: dict, parent_data: dict, prediction: dic
 
 def generate_fallback_prescription(student_data: dict, parent_data: dict, prediction: dict):
     """Gemini API 사용 불가 시 기본 처방전"""
-
+    
     roadmap = f"""
 **🎓 NCS 기반 단계별 성장 로드맵**
 * 직업기초능력 평균 {student_data.get('학생_직기초_의사소통_국어', 3)}등급

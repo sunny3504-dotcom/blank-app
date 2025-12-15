@@ -226,7 +226,7 @@ with st.form("student_form"):
             "직업 환경 유형 *",
             options,
             index=default_index(options, stored.get("학생_직업환경유형", options[0])),
-            help="업무 방식, 조직 문화, 일의 성격 측면에서 본인에게 가장 잘 맞는 직업 환경 유형을 선택해주세요."
+            help="현재 희망하는 직업 환경 유형을 선택해주세요."
         )
         
         # 산업선호도 1순위
@@ -257,7 +257,7 @@ with st.form("student_form"):
             "흥미 일관성 등급 *",
             options,
             index=default_index(options, stored.get("학생_흥미일관성등급", "C"), 2),
-            help="여러 검사나 경험에서 진로 흥미가 얼마나 일관되게 나타나는지에 대한 수준을 선택해주세요."
+            help="산업직무적성검사에서 제시된 흥미 일관성 등급을 선택해주세요."
         )
         
         # 산업선호도 2순위

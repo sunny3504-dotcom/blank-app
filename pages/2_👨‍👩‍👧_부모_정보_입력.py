@@ -9,9 +9,9 @@ from utils.storage import save_user_data
 st.set_page_config(page_title="부모 정보 입력", page_icon="👨‍👩‍👧", layout="wide")
 
 # ==== 🔵 저장된 데이터 불러오기 (추가된 핵심 기능) ====
-stored = st.session_state.get("parent_data", {})  # 기존 저장된 부모 정보 불러오기
+stored = st.session_state.get("parent_data") or {}  # ✅ None 방지 + 기존 저장된 부모 정보 불러오기
 
-# ==== 🔧 안전한 기본값 인덱스 계산 함수 ====
+# ==== 🔧 안전한 기본값 인덱스 계산 함수 (추가) ====
 def default_index(options, value, fallback_index=0):
     try:
         return options.index(value)
@@ -60,13 +60,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
 # 로그인 확인
-if "student_id" not in st.session_state or st.session_state.student_id is None:
+if 'student_id' not in st.session_state or st.session_state.student_id is None:
     st.error("⚠️ 로그인이 필요합니다. 메인 페이지에서 학생 이름을 입력해주세요.")
     st.stop()
 
-# 로그아웃 버튼
+# 사이드바에 로그아웃 버튼 추가
 st.sidebar.markdown("---")
 if st.sidebar.button("🚪 로그아웃", key="sidebar_logout", use_container_width=True):
     st.session_state.student_id = None
@@ -79,10 +78,7 @@ st.markdown(f"**세션 ID:** {st.session_state.student_id}")
 st.markdown("자녀의 진로 설계를 위한 부모님의 의견을 입력해주세요.")
 st.markdown("---")
 
-
-# -------------------------------------------------------
 # 폼 시작
-# -------------------------------------------------------
 with st.form("parent_form"):
 
     # ========== 1. 부모의 희망 및 지지 ==========
@@ -96,14 +92,16 @@ with st.form("parent_form"):
         부모_희망직무 = st.selectbox(
             "희망 직무 *",
             options,
-            index=default_index(options, stored.get("부모_희망직무", options[0]))
+            index=default_index(options, stored.get("부모_희망직무", options[0]), 0),
+            help="부모님께서 보시기에 자녀에게 잘 맞을 것 같은 직무를 선택해주세요."
         )
 
         options = ["매우 낮음", "낮음", "보통", "높음", "매우 높음"]
         부모_지지수준 = st.selectbox(
             "진로 지지 수준 *",
             options,
-            index=default_index(options, stored.get("부모_지지수준", "보통"), 2)
+            index=default_index(options, stored.get("부모_지지수준", "보통"), 2),
+            help="자녀가 원하는 진로를 부모님이 얼마나 지지하는지 알려주세요."
         )
 
     with col2:
@@ -111,7 +109,8 @@ with st.form("parent_form"):
         부모_압력수준 = st.selectbox(
             "압력 수준 *",
             options,
-            index=default_index(options, stored.get("부모_압력수준", "보통"), 2)
+            index=default_index(options, stored.get("부모_압력수준", "보통"), 2),
+            help="부모님이 자녀의 진로 선택에 대해 가하는 압력 수준은 어느 정도입니까?"
         )
 
     st.markdown("---")
@@ -126,19 +125,24 @@ with st.form("parent_form"):
         부모_자녀강점인식 = st.selectbox(
             "자녀 강점 인식 *",
             options,
-            index=default_index(options, stored.get("부모_자녀강점인식", "보통"), 2)
+            index=default_index(options, stored.get("부모_자녀강점인식", "보통"), 2),
+            help="부모님께서 보시기에 자녀가 얼마나 강점을 가지고 있다고 생각하시나요?"
         )
 
+        options = ["매우 낮음", "낮음", "보통", "높음", "매우 높음"]
         부모_자녀학습태도인식 = st.selectbox(
             "자녀 학습태도 인식 *",
             options,
-            index=default_index(options, stored.get("부모_자녀학습태도인식", "보통"), 2)
+            index=default_index(options, stored.get("부모_자녀학습태도인식", "보통"), 2),
+            help="자녀 학습 태도에 대해 얼마나 잘 인식하고 있다고 생각하는지 선택해주세요."
         )
 
+        options = ["매우 낮음", "낮음", "보통", "높음", "매우 높음"]
         부모_미래직업전망인식 = st.selectbox(
             "미래 직업 전망 인식 *",
             options,
-            index=default_index(options, stored.get("부모_미래직업전망인식", "보통"), 2)
+            index=default_index(options, stored.get("부모_미래직업전망인식", "보통"), 2),
+            help="전기 분야 직무의 미래 전망(안정성·성장성)에 대해 부모님은 어떻게 생각하시나요?"
         )
 
     with col2:
@@ -146,14 +150,16 @@ with st.form("parent_form"):
         부모_자녀진로변화허용도 = st.selectbox(
             "자녀 진로 변화 허용도 *",
             options,
-            index=default_index(options, stored.get("부모_자녀진로변화허용도", "보통"), 2)
+            index=default_index(options, stored.get("부모_자녀진로변화허용도", "보통"), 2),
+            help="자녀가 진로 계획을 변경하려 할 때 허용해줄 수 있는 수준을 선택해주세요."
         )
 
         options = ["거의 하지 않는다", "가끔 한다", "보통이다", "자주 한다", "매우 자주 한다"]
         부모_진로대화빈도 = st.selectbox(
             "진로 대화 빈도 *",
             options,
-            index=default_index(options, stored.get("부모_진로대화빈도", "보통이다"), 2)
+            index=default_index(options, stored.get("부모_진로대화빈도", "보통이다"), 2),
+            help="부모님과 자녀가 진로 관련 대화를 얼마나 자주 나누는지 선택해주세요."
         )
 
     st.markdown("---")
@@ -170,7 +176,8 @@ with st.form("parent_form"):
         부모_현재직무 = st.selectbox(
             "부모 현재 직무 *",
             options,
-            index=default_index(options, stored.get("부모_현재직무", options[0]))
+            index=default_index(options, stored.get("부모_현재직무", options[0]), 0),
+            help="부모님의 현재 직업 유형을 선택해주세요."
         )
 
     with col2:
@@ -178,7 +185,8 @@ with st.form("parent_form"):
         부모_직무만족도 = st.selectbox(
             "직무 만족도 *",
             options,
-            index=default_index(options, stored.get("부모_직무만족도", "보통"), 2)
+            index=default_index(options, stored.get("부모_직무만족도", "보통"), 2),
+            help="부모님의 현재 직업에 대한 만족도를 선택해주세요."
         )
 
     st.markdown("---")
@@ -189,12 +197,12 @@ with st.form("parent_form"):
     col1, col2 = st.columns(2)
 
     with col1:
-        options = ["책임감", "문제해결력", "집중력", "손재능", "의사소통",
-                   "협업능력", "리더십", "창의성", "기타"]
+        options = ["책임감", "문제해결력", "집중력", "손재능", "의사소통", "협업능력", "리더십", "창의성", "기타"]
         부모_자녀강점유형 = st.selectbox(
             "자녀 강점 유형 *",
             options,
-            index=default_index(options, stored.get("부모_자녀강점유형", options[0]))
+            index=default_index(options, stored.get("부모_자녀강점유형", options[0]), 0),
+            help="부모님께서 생각하시는 자녀의 가장 큰 강점을 선택해주세요."
         )
 
     with col2:
@@ -202,7 +210,8 @@ with st.form("parent_form"):
         부모_희망직무일치수준 = st.selectbox(
             "희망직무 일치 수준 *",
             options,
-            index=default_index(options, stored.get("부모_희망직무일치수준", "부분 유사"), 1)
+            index=default_index(options, stored.get("부모_희망직무일치수준", "부분 유사"), 1),
+            help="부모님과 자녀의 희망 직무가 어느 정도 일치한다고 생각하는지 선택해주세요."
         )
 
     # 제출 버튼
@@ -210,6 +219,7 @@ with st.form("parent_form"):
     submitted = st.form_submit_button("💾 부모 정보 저장하기", use_container_width=True)
 
     if submitted:
+        # 데이터 저장
         parent_data = {
             "부모_희망직무": 부모_희망직무,
             "부모_지지수준": 부모_지지수준,

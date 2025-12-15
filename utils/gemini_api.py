@@ -6,48 +6,50 @@ NCS, SCCT, RIASEC 기반 진로 처방전 생성 (가독성 개선 버전)
 import streamlit as st
 import os
 
+
 def initialize_gemini():
     """Gemini API 초기화"""
     try:
         import google.generativeai as genai
-        
+
         # API 키 확인
         api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
-        
+
         if not api_key:
             return None
-        
+
         genai.configure(api_key=api_key)
-        
+
         # 모델 초기화 (최신 버전)
         model = genai.GenerativeModel('gemini-flash-latest')
         return model
-        
+
     except Exception as e:
         st.warning(f"⚠️ Gemini API 초기화 실패: {e}")
         return None
+
 
 
 def generate_prescription(student_data: dict, parent_data: dict, prediction: dict):
     """
     NCS CBE, SCCT, RIASEC 이론 기반 맞춤형 진로 처방전 생성
     """
-    
+
     model = initialize_gemini()
-    
+
     if model is None:
         return generate_fallback_prescription(student_data, parent_data, prediction)
-    
+
     # 직업기초능력 평균 계산
     jik_avg = (
-        student_data.get('학생_직기초_의사소통_국어', 3) + 
-        student_data.get('학생_직기초_의사소통_영어', 3) + 
-        student_data.get('학생_직기초_수리활용', 3) + 
-        student_data.get('학생_직기초_문제해결', 3) + 
+        student_data.get('학생_직기초_의사소통_국어', 3) +
+        student_data.get('학생_직기초_의사소통_영어', 3) +
+        student_data.get('학생_직기초_수리활용', 3) +
+        student_data.get('학생_직기초_문제해결', 3) +
         student_data.get('학생_직기초_직무적응', 3)
     ) / 5
-    
-    # 프롬프트 생성 (가독성 및 구조화 강화)
+
+    # 프롬프트 생성
     prompt = f"""
 ※ 개인정보, 의료정보, 정신건강, 가족 갈등, 심리 진단, 상담 등 민감한 내용은 절대 언급하거나 추론하지 마십시오.
 학생과 부모를 평가하거나 단정하는 표현도 사용하지 마십시오.
@@ -78,7 +80,7 @@ def generate_prescription(student_data: dict, parent_data: dict, prediction: dic
 ## 작성 지침 (필수 준수)
 1. **톤앤매너**: 따뜻하지만 전문적인 어조("~합니다", "~권장합니다").
 2. **포맷**: 긴 줄글을 피하고, **글머리 기호(-)**와 **볼드체**를 적극 사용하여 가독성을 높이세요.
-3. **구분자**: 각 섹션 사이에는 반드시 `[[SECTION_SPLIT]]` 라는 구분자를 넣으세요. (제목은 넣지 마세요)
+3. **구분자**: 각 섹션 사이에는 반드시 `[[SECTION_SPLIT]]` 를 넣으세요. (제목은 넣지 않음)
 
 ## 작성할 내용 (3개 섹션)
 
@@ -89,100 +91,84 @@ def generate_prescription(student_data: dict, parent_data: dict, prediction: dic
 
 **섹션 2: 강점·약점 기반 전략 (RIASEC & P-E Fit)**
 - **핵심 강점**: 학생의 강점이 지원 직무({prediction['top3_jobs'][0]})에서 어떻게 빛을 발할지 설명
-- **보완점**: 약점을 보완하기 위한 학습/태도 전략 (피드백 수용 등)
-- **직무 적합성(Fit)**: 학생의 성향/선호환경과 추천 직무 환경의 일치 여부 분석
+- **보완점**: 약점을 보완하기 위한 학습/태도 전략
+- **직무 적합성(Fit)**: 학생 성향과 직무 환경의 일치 분석
 
 **섹션 3: 부모–학생 분석 (SCCT 맥락적 지지)**
-- **인식 차이**: 학생과 부모의 희망 직무 차이에 대한 객관적 비교
-- **지지와 소통**: 부모님의 지지/압력 수준을 고려한 대화법 조언
-- **AI의 제언**: 갈등을 줄이고 시너지를 낼 수 있는 '한 줄 솔루션'
+- **인식 차이**: 부모-학생 희망 직무 차이 비교
+- **지지와 소통**: 부모님의 지지/압력 수준 기반 대화법 제안
+- **AI의 제언**: 갈등을 줄이고 시너지를 낼 수 있는 핵심 조언
 
 ---
 이제 작성을 시작하세요.
 """
-    
-try:
-    response = model.generate_content(prompt)
 
-    # 응답 안전성 체크
-    if (
-        not response
-        or not getattr(response, "candidates", None)
-        or len(response.candidates) == 0
-        or not response.candidates[0].content.parts
-    ):
+    try:
+        response = model.generate_content(prompt)
+
+        # 응답 안전성 체크
+        if (
+            not response
+            or not getattr(response, "candidates", None)
+            or len(response.candidates) == 0
+            or not response.candidates[0].content.parts
+        ):
+            return {
+                "roadmap": "⚠️ Gemini가 안전성 정책으로 인해 응답을 생성하지 못했습니다.",
+                "strategy": "⚠️ 기본 분석만 제공됩니다.",
+                "gap_analysis": "⚠️ 응답 생성 실패로 인해 간단한 메시지만 제공합니다."
+            }
+
+        text = response.text
+
+        # 섹션 분리
+        parts = text.split("[[SECTION_SPLIT]]")
+        roadmap = parts[0].strip() if len(parts) > 0 else ""
+        strategy = parts[1].strip() if len(parts) > 1 else ""
+        gap_analysis = parts[2].strip() if len(parts) > 2 else ""
+
+        # 헤더 제거 함수
+        def clean_headers(t):
+            return "\n".join([line for line in t.split("\n") if not line.startswith("#")]).strip()
+
         return {
-            "roadmap": "⚠️ Gemini가 안전성 정책으로 인해 응답을 생성하지 못했습니다.",
-            "strategy": "⚠️ 기본 분석만 제공됩니다.",
-            "gap_analysis": "⚠️ 응답 생성 실패로 인해 간단한 메시지만 제공합니다."
+            "roadmap": clean_headers(roadmap),
+            "strategy": clean_headers(strategy),
+            "gap_analysis": clean_headers(gap_analysis),
+            "full_text": text.replace("[[SECTION_SPLIT]]", "\n\n---\n\n")
         }
 
-    text = response.text
-
-    # 섹션 분리
-    parts = text.split("[[SECTION_SPLIT]]")
-    roadmap = parts[0].strip() if len(parts) > 0 else ""
-    strategy = parts[1].strip() if len(parts) > 1 else ""
-    gap_analysis = parts[2].strip() if len(parts) > 2 else ""
-
-    # 헤더 제거 함수
-    def clean_headers(t):
-        return "\n".join([line for line in t.split("\n") if not line.startswith("#")]).strip()
-
-    return {
-        "roadmap": clean_headers(roadmap),
-        "strategy": clean_headers(strategy),
-        "gap_analysis": clean_headers(gap_analysis),
-        "full_text": text.replace("[[SECTION_SPLIT]]", "\n\n---\n\n")
-    }
-
-except Exception as e:
-    st.error(f"❌ Gemini API 호출 오류: {e}")
-    return generate_fallback_prescription(student_data, parent_data, prediction)
+    except Exception as e:
+        st.error(f"❌ Gemini API 호출 오류: {e}")
+        return generate_fallback_prescription(student_data, parent_data, prediction)
 
 
 
 def generate_fallback_prescription(student_data: dict, parent_data: dict, prediction: dict):
-    """Gemini API 사용 불가 시 기본 처방전 (마크다운 포맷 적용)"""
-    
+    """Gemini API 사용 불가 시 기본 처방전"""
+
     roadmap = f"""
 **🎓 NCS 기반 단계별 성장 로드맵**
 
-* **현재 분석**: 직업기초능력 평균 **{student_data.get('학생_직기초_의사소통_국어', 3)}등급** 수준으로, 실무 기초 역량 강화가 필요합니다.
-* **추천 목표**:
-    * **단기**: 전기기능사 자격증 취득 및 필수 교과(전기, 수학) B등급 이상 달성
-    * **장기**: {prediction['top3_jobs'][0]} 분야의 현장 실습 경험 확보
-* **액션 플랜**:
-    * 부족한 **문제해결능력** 향상을 위해 프로젝트 기반 실습 수업에 적극 참여하세요.
-    * NCS 능력단위 평가에서 '기능' 요소를 중점적으로 보완하세요.
-
-*(⚠️ 현재 Gemini API 키가 설정되지 않아 기본 템플릿이 표시됩니다.)*
+* 직업기초능력 평균 **{student_data.get('학생_직기초_의사소통_국어', 3)}등급**. 실무 기초 역량 강화 필요.
+* 전기기능사 준비 → 실습 기반 성장.
+* 전기({student_data.get('학생_전기교과성취도', '')})·수학({student_data.get('학생_수학교과성취도', '')}) 성취도 향상 권장.
 """
-    
+
     strategy = f"""
-**💪 강점 활용 및 약점 보완 전략**
+**💪 강점·약점 기반 전략**
 
-* **핵심 강점 (Strength)**
-    * **{student_data.get('학생_자기강점유형', '성실함')}**: 이 강점은 {prediction['top3_jobs'][0]} 직무 수행 시 큰 자산이 됩니다.
-    * 선호하는 **{student_data.get('학생_근무환경선호_실내실외', '실내')}** 환경과 추천 직무의 매칭도가 높습니다.
-* **보완 전략 (Weakness)**
-    * 수학 교과 성취도가 낮다면, 기초 공학 수학을 방과 후 학습으로 보충하세요.
-* **Person-Environment Fit**
-    * 학생의 **{student_data.get('학생_직업환경유형', '')}** 성향은 추천 직무의 조직 문화와 잘 어울립니다.
+* 강점: **{student_data.get('학생_자기강점유형', '성실함')}**
+* 약점 보완: 수학·문제해결 역량 보완
 """
-    
+
     gap_analysis = f"""
-**👨‍👩‍👧 부모-학생 진로 인식 분석**
+**👨‍👩‍👧 부모–학생 인식 분석**
 
-* **희망 직무 비교**
-    * 🧑‍🎓 학생: **{student_data.get('학생_희망직무', '')}** vs 👨‍👩‍👧 부모: **{parent_data.get('부모_희망직무', '')}**
-* **진로 대화 가이드**
-    * 현재 부모님의 지지 수준은 **'{parent_data.get('부모_지지수준', '')}'** 입니다.
-    * 진로 대화 빈도가 **'{parent_data.get('부모_진로대화빈도', '')}'**이므로, AI 분석 결과(데이터)를 토대로 구체적인 대화를 시작해보세요.
-* **전문가 제언**
-    * 학생의 적성과 흥미 데이터를 부모님께 보여드리고, 왜 이 직무가 적합한지 객관적으로 설명하는 시간을 가지세요.
+* 학생 희망직무: {student_data.get('학생_희망직무', '')}
+* 부모 희망직무: {parent_data.get('부모_희망직무', '')}
 """
-    
+
     return {
         "roadmap": roadmap,
         "strategy": strategy,
